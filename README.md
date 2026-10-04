@@ -38,25 +38,42 @@ The build creates store-ready distribution zips in `.output/`:
 
 ---
 
-## Local Installation (Developer Mode)
+## 📦 Quick Start & Installation
 
-### Mozilla Firefox
-1. Open `about:debugging#/runtime/this-firefox`.
-2. If already loaded, simply click **Reload** under ULTRON.
-3. If installing fresh, click **Load Temporary Add-on** and select:
+### 1. Clone & Build
+```bash
+git clone https://github.com/SujoyBehera/Ultron.git
+cd Ultron
+npm install
+
+# Build for Brave / Google Chrome / Microsoft Edge:
+npm run build
+
+# Build for Mozilla Firefox:
+npm run build:firefox
+```
+
+---
+
+### 2. Load into Your Browser
+
+#### Mozilla Firefox
+1. Navigate to `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on**.
+3. Select the `manifest.json` file located in the output folder:
    ```
-   C:\Users\sujoy\.gemini\antigravity\scratch\webpilot\.output\firefox-mv3\manifest.json
+   .output/firefox-mv3/manifest.json
    ```
-4. Open `about:addons` → **ULTRON** → **Permissions**, and verify **"Access your data for all websites"** is toggled ON.
+4. Open `about:addons` → **ULTRON** → **Permissions**, and verify **"Access your data for all websites"** is toggled ON (required by Firefox MV3 for content scripts).
 5. Click the ULTRON emblem in your toolbar or sidebar to open the cybernetic side panel.
 
-### Brave / Chrome / Edge
-1. Open `brave://extensions` (or `chrome://extensions` / `edge://extensions`).
+#### Brave / Google Chrome / Microsoft Edge
+1. Navigate to `brave://extensions` (or `chrome://extensions` / `edge://extensions`).
 2. Toggle on **Developer mode** in the top right.
-3. If already loaded, click the **Refresh** icon on the ULTRON card.
-4. If installing fresh, click **Load unpacked** and select:
+3. Click **Load unpacked**.
+4. Select the build directory:
    ```
-   C:\Users\sujoy\.gemini\antigravity\scratch\webpilot\.output\chrome-mv3
+   .output/chrome-mv3
    ```
 5. Click the ULTRON emblem in your extension toolbar to launch the side panel.
 

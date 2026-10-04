@@ -1,6 +1,6 @@
 {
-  "name": "webpilot",
-  "description": "Local-first AI agent for your browser side panel: ask, act, and write code live on any page.",
+  "name": "ultron",
+  "description": "Autonomous cybernetic web intelligence & DOM synthesizer in your browser side panel.",
   "private": true,
   "version": "0.1.0",
   "type": "module",

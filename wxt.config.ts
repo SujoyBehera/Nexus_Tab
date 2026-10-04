@@ -6,7 +6,7 @@ export default defineConfig({
     name: 'ULTRON',
     description:
       'Autonomous Cybernetic AI Agent: analyze pages, execute directives, and write code live.',
-    homepage_url: 'https://github.com/your-username/ultron',
+    homepage_url: 'https://github.com/SujoyBehera/Ultron',
     permissions: [
       'storage',
       'scripting',
