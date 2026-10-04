@@ -3,7 +3,7 @@
 > **Autonomous Cybernetic Web Intelligence & DOM Synthesizer**
 > *Living directly in your browser's side panel.*
 
-ULTRON is an autonomous AI browser companion with an **Avengers / Ultron cybernetic HUD theme** featuring metallic obsidian styling, crimson neon glowing accents, tactical directive execution, live in-page code synthesis, and zero-token deterministic macros.
+ULTRON is an autonomous AI browser companion with an **Ultron cybernetic HUD theme** featuring metallic obsidian styling, crimson neon glowing accents, tactical directive execution, live in-page code synthesis, and zero-token deterministic macros.
 
 Compatible with **Brave**, **Google Chrome**, **Microsoft Edge**, and **Mozilla Firefox**.
 
@@ -11,7 +11,7 @@ Compatible with **Brave**, **Google Chrome**, **Microsoft Edge**, and **Mozilla 
 
 ## ⚡ What's New in the ULTRON Edition
 
-* **Avengers / Ultron Cybernetic Aesthetic**:
+* **Ultron Cybernetic Aesthetic**:
   * Dark metallic obsidian chassis (`#07080c`) with glowing crimson neon accents (`#ef4444`) and tactical arc-cyan telemetry highlights.
   * Custom metallic Ultron emblem icon and animated halo pulse indicator.
   * Status Beacon in header: `CORE ONLINE` (ready), `EXECUTING` (pulsing crimson radar during active directives), `OVERRIDE REQ` (tactical authorization needed).
