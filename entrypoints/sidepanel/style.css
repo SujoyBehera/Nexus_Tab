@@ -286,7 +286,7 @@ main {
   flex: 1;
   overflow-y: auto;
   padding: 12px;
-  padding-bottom: 120px; /* Essential: prevents last step occlusion by bottom dock */
+  padding-bottom: 140px; /* Essential: prevents last step occlusion by bottom dock */
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -779,7 +779,7 @@ button.delete-macro:hover {
   bottom: 125px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(15, 18, 28, 0.95);
+  background: rgba(15, 18, 28, 0.96);
   border: 1px solid var(--accent);
   color: #fff;
   font-family: var(--font-mono);
@@ -787,8 +787,10 @@ button.delete-macro:hover {
   padding: 5px 14px;
   border-radius: 20px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 10px rgba(239, 68, 68, 0.35);
-  z-index: 20;
+  z-index: 30;
   cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -799,6 +801,9 @@ button.delete-macro:hover {
   border-color: #ff3b4b;
   box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
   transform: translateX(-50%) translateY(-1px);
+}
+.jump-latest-btn:active {
+  transform: translateX(-50%) scale(0.96);
 }
 
 /* Futuristic Code Block */

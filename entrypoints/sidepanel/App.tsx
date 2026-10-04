@@ -153,23 +153,40 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
+  const isProgrammaticScrollRef = useRef(false);
+
   // Smart auto-scroll: only scrolls down if user hasn't scrolled up
   useEffect(() => {
-    if (!userScrolledUp) {
-      bottomRef.current?.scrollIntoView({ block: 'end' });
+    if (!userScrolledUp && mainRef.current) {
+      mainRef.current.scrollTo({
+        top: mainRef.current.scrollHeight,
+        behavior: 'auto',
+      });
     }
   }, [messages, approval, pending, userScrolledUp]);
 
   const onScroll = () => {
-    if (!mainRef.current) return;
+    if (!mainRef.current || isProgrammaticScrollRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = mainRef.current;
-    const isNearBottom = scrollHeight - scrollTop - clientHeight < 80;
-    setUserScrolledUp(!isNearBottom);
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+    setUserScrolledUp(distanceFromBottom > 45);
   };
 
   const scrollToBottom = () => {
     setUserScrolledUp(false);
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    isProgrammaticScrollRef.current = true;
+    if (mainRef.current) {
+      mainRef.current.scrollTo({
+        top: mainRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+    setTimeout(() => {
+      isProgrammaticScrollRef.current = false;
+      if (mainRef.current) {
+        mainRef.current.scrollTop = mainRef.current.scrollHeight;
+      }
+    }, 450);
   };
 
   const flash = (text: string) => {
@@ -716,12 +733,12 @@ export default function App() {
               </div>
             )}
 
-            <div ref={bottomRef} />
+            <div ref={bottomRef} style={{ height: 20, flexShrink: 0 }} />
           </main>
 
           {/* Floating jump to latest button if user scrolled up */}
           {userScrolledUp && (
-            <button className="jump-latest-btn" onClick={scrollToBottom}>
+            <button className="jump-latest-btn" type="button" onClick={scrollToBottom}>
               ↓ Jump to latest
             </button>
           )}
