@@ -28,19 +28,40 @@ Compatible with **Brave**, **Google Chrome**, **Microsoft Edge**, and **Mozilla 
 
 ---
 
-## Ready-to-Deploy Packages
+## 🚀 Direct Download & 1-Click Install
 
-The build creates store-ready distribution zips in `.output/`:
+Download ready-to-run packages directly from [**Releases (v0.1.0)**](https://github.com/SujoyBehera/Ultron/releases/tag/v0.1.0):
 
-* **Brave / Chrome / Edge**: `.output/webpilot-0.1.0-chrome.zip` (Upload to Chrome Web Store or Edge Add-ons)
-* **Firefox**: `.output/webpilot-0.1.0-firefox.zip` (Upload to Mozilla Add-ons / AMO)
-* **Firefox Sources (required by AMO)**: `.output/webpilot-0.1.0-sources.zip`
+| Browser | Package | Installation (30 Seconds) |
+| :--- | :--- | :--- |
+| **🦊 Mozilla Firefox** | [**`ultron-0.1.0-firefox-signed.xpi`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-firefox-signed.xpi) | Officially signed by Mozilla! Drag & drop the `.xpi` file directly into any Firefox window and click **Add**. |
+| **🌐 Chrome / Brave / Edge** | [**`ultron-0.1.0-chrome.zip`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-chrome.zip) | Extract zip ➔ open `chrome://extensions` ➔ toggle **Developer mode** ➔ click **Load unpacked** ➔ select folder. |
 
 ---
 
 ## 📦 Quick Start & Installation
 
-### 1. Clone & Build
+### Option A: Direct Install (Recommended for End Users)
+
+#### 🦊 Mozilla Firefox (Permanent Signed Install)
+1. Download [**`ultron-0.1.0-firefox-signed.xpi`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-firefox-signed.xpi).
+2. Drag and drop the downloaded `.xpi` file into Firefox (or open `about:addons` ➔ ⚙️ ➔ **Install Add-on From File...**).
+3. Click **Add** when prompted.
+4. Go to `about:addons` → **ULTRON** → **Permissions**, and verify **"Access your data for all websites"** is toggled **ON** (required by Firefox MV3 for sidebar and page interaction).
+5. Done! ULTRON stays permanently installed across all sessions and restarts.
+
+#### 🌐 Google Chrome / Brave / Microsoft Edge
+1. Download [**`ultron-0.1.0-chrome.zip`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-chrome.zip).
+2. Unzip the file into a folder on your computer.
+3. In your browser, navigate to `chrome://extensions` (or `brave://extensions` / `edge://extensions`).
+4. Toggle on **Developer mode** in the top right.
+5. Click **Load unpacked** in the top left and select the unzipped folder.
+6. Click the ULTRON emblem in your extension toolbar to launch the cybernetic side panel.
+
+---
+
+### Option B: Build from Source (Developers)
+
 ```bash
 git clone https://github.com/SujoyBehera/Ultron.git
 cd Ultron
@@ -52,30 +73,6 @@ npm run build
 # Build for Mozilla Firefox:
 npm run build:firefox
 ```
-
----
-
-### 2. Load into Your Browser
-
-#### Mozilla Firefox
-1. Navigate to `about:debugging#/runtime/this-firefox`.
-2. Click **Load Temporary Add-on**.
-3. Select the `manifest.json` file located in the output folder:
-   ```
-   .output/firefox-mv3/manifest.json
-   ```
-4. Open `about:addons` → **ULTRON** → **Permissions**, and verify **"Access your data for all websites"** is toggled ON (required by Firefox MV3 for content scripts).
-5. Click the ULTRON emblem in your toolbar or sidebar to open the cybernetic side panel.
-
-#### Brave / Google Chrome / Microsoft Edge
-1. Navigate to `brave://extensions` (or `chrome://extensions` / `edge://extensions`).
-2. Toggle on **Developer mode** in the top right.
-3. Click **Load unpacked**.
-4. Select the build directory:
-   ```
-   .output/chrome-mv3
-   ```
-5. Click the ULTRON emblem in your extension toolbar to launch the side panel.
 
 ---
 
