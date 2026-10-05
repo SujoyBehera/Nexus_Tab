@@ -6,7 +6,7 @@ export default defineConfig({
     name: 'Nexus Tab',
     description:
       'Autonomous AI Web Copilot: synthesize page intelligence, execute tactical DOM directives, and edit code live.',
-    homepage_url: 'https://github.com/SujoyBehera/Ultron',
+    homepage_url: 'https://github.com/SujoyBehera/Nexus_Tab',
     permissions: [
       'storage',
       'scripting',
