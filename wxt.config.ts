@@ -3,9 +3,9 @@ import { defineConfig } from 'wxt';
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: ({ browser }) => ({
-    name: 'ULTRON',
+    name: 'Nexus Tab',
     description:
-      'Autonomous Cybernetic AI Agent: analyze pages, execute directives, and write code live.',
+      'Autonomous AI Web Copilot: synthesize page intelligence, execute tactical DOM directives, and edit code live.',
     homepage_url: 'https://github.com/SujoyBehera/Ultron',
     permissions: [
       'storage',
@@ -16,7 +16,7 @@ export default defineConfig({
       ...(browser === 'firefox' ? [] : ['sidePanel']),
     ],
     host_permissions: ['<all_urls>'],
-    action: { default_title: 'Open ULTRON' },
+    action: { default_title: 'Open Nexus Tab' },
     ...(browser === 'firefox'
       ? {
           browser_specific_settings: {

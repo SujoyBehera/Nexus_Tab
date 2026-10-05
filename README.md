@@ -1,20 +1,20 @@
-# ULTRON
+# Nexus Tab
 
 > **Autonomous Cybernetic Web Intelligence & DOM Synthesizer**
 > *Living directly in your browser's side panel.*
 
-ULTRON is an autonomous AI browser companion with an **Ultron cybernetic HUD theme** featuring metallic obsidian styling, crimson neon glowing accents, tactical directive execution, live in-page code synthesis, and zero-token deterministic macros.
+Nexus Tab is an autonomous AI browser companion featuring an **electric crystalline cybernetic HUD theme**, deep obsidian styling, glowing cyan accents, tactical directive execution, live in-page code synthesis, and zero-token deterministic macros.
 
 Compatible with **Brave**, **Google Chrome**, **Microsoft Edge**, and **Mozilla Firefox**.
 
 ---
 
-## ⚡ What's New in the ULTRON Edition
+## ⚡ What's New in the Nexus Tab Edition
 
-* **Ultron Cybernetic Aesthetic**:
-  * Dark metallic obsidian chassis (`#07080c`) with glowing crimson neon accents (`#ef4444`) and tactical arc-cyan telemetry highlights.
-  * Custom metallic Ultron emblem icon and animated halo pulse indicator.
-  * Status Beacon in header: `CORE ONLINE` (ready), `EXECUTING` (pulsing crimson radar during active directives), `OVERRIDE REQ` (tactical authorization needed).
+* **Crystalline Cybernetic Aesthetic**:
+  * Deep midnight sapphire chassis (`#070a13`) with electric cyan glowing accents (`#0ea5e9`, `#38bdf8`) and tactical telemetry highlights.
+  * Custom crystalline circuit emblem icon and animated halo pulse indicator.
+  * Status Beacon in header: `CORE ONLINE` (ready), `EXECUTING` (pulsing cyan radar during active directives), `OVERRIDE REQ` (tactical authorization needed).
 * **Header Quick-Model Switcher**:
   * Seamlessly toggle active AI providers and models (Google Gemini, OpenAI, Claude, Ollama local, OpenRouter, Groq) directly from the top bar dropdown without needing to open Settings.
 * **Autonomous Directive Progression**:
@@ -30,12 +30,12 @@ Compatible with **Brave**, **Google Chrome**, **Microsoft Edge**, and **Mozilla 
 
 ## 🚀 Direct Download & 1-Click Install
 
-Download ready-to-run packages directly from [**Releases (v0.1.0)**](https://github.com/SujoyBehera/Ultron/releases/tag/v0.1.0):
+Download ready-to-run packages directly from [**Releases**](https://github.com/SujoyBehera/Ultron/releases):
 
 | Browser | Package | Installation (30 Seconds) |
 | :--- | :--- | :--- |
 | **🦊 Mozilla Firefox** | [**`ultron-0.1.0-firefox-signed.xpi`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-firefox-signed.xpi) | Officially signed by Mozilla! Drag & drop the `.xpi` file directly into any Firefox window and click **Add**. |
-| **🌐 Chrome / Brave / Edge** | [**`ultron-0.1.0-chrome.zip`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-chrome.zip) | Extract zip ➔ open `chrome://extensions` ➔ toggle **Developer mode** ➔ click **Load unpacked** ➔ select folder. |
+| **🌐 Chrome / Brave / Edge** | [**`nexus-tab-0.1.0-chrome.zip`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-chrome.zip) | Extract zip ➔ open `chrome://extensions` ➔ toggle **Developer mode** ➔ click **Load unpacked** ➔ select folder. |
 
 ---
 
@@ -47,16 +47,16 @@ Download ready-to-run packages directly from [**Releases (v0.1.0)**](https://git
 1. Download [**`ultron-0.1.0-firefox-signed.xpi`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-firefox-signed.xpi).
 2. Drag and drop the downloaded `.xpi` file into Firefox (or open `about:addons` ➔ ⚙️ ➔ **Install Add-on From File...**).
 3. Click **Add** when prompted.
-4. Go to `about:addons` → **ULTRON** → **Permissions**, and verify **"Access your data for all websites"** is toggled **ON** (required by Firefox MV3 for sidebar and page interaction).
-5. Done! ULTRON stays permanently installed across all sessions and restarts.
+4. Go to `about:addons` → **Nexus Tab** → **Permissions**, and verify **"Access your data for all websites"** is toggled **ON** (required by Firefox MV3 for sidebar and page interaction).
+5. Done! Nexus Tab stays permanently installed across all sessions and restarts.
 
 #### 🌐 Google Chrome / Brave / Microsoft Edge
-1. Download [**`ultron-0.1.0-chrome.zip`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-chrome.zip).
+1. Download [**`nexus-tab-0.1.0-chrome.zip`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-chrome.zip).
 2. Unzip the file into a folder on your computer.
 3. In your browser, navigate to `chrome://extensions` (or `brave://extensions` / `edge://extensions`).
 4. Toggle on **Developer mode** in the top right.
 5. Click **Load unpacked** in the top left and select the unzipped folder.
-6. Click the ULTRON emblem in your extension toolbar to launch the cybernetic side panel.
+6. Click the Nexus Tab emblem in your extension toolbar to launch the cybernetic side panel.
 
 ---
 

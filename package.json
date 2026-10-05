@@ -1,6 +1,6 @@
 {
-  "name": "ultron",
-  "description": "Autonomous cybernetic web intelligence & DOM synthesizer in your browser side panel.",
+  "name": "nexus-tab",
+  "description": "Nexus Tab — Autonomous AI browser companion and DOM synthesizer.",
   "private": true,
   "version": "0.1.0",
   "type": "module",

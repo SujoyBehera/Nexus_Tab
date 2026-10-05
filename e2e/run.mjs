@@ -171,8 +171,8 @@ try {
   check('Ask: no "[object" / error rendering', !askText.includes('Could not') && !askText.includes('error'), askText);
 
   // ---- Act (record)
-  await panel.click('.composer ~ * , .modes button:has-text("Act")').catch(() => {});
-  await panel.locator('.modes button', { hasText: 'Act' }).click();
+  await panel.click('.mode-selector-btn');
+  await panel.locator('.modes button[data-mode="act"]').click();
   await send('fill form with hello');
   await panel.waitForSelector('.save-macro', { timeout: 40000 });
   await waitIdle();
@@ -189,7 +189,8 @@ try {
   check('Macro: saved with 2 steps', stored?.length === 1 && stored[0].steps.length === 2, JSON.stringify(stored));
 
   // ---- Dev (logs seen + code written + Apply/Undo)
-  await panel.locator('.modes button', { hasText: 'Dev' }).click();
+  await panel.click('.mode-selector-btn');
+  await panel.locator('.modes button[data-mode="dev"]').click();
   await send('make the heading red');
   await panel.waitForSelector('.code', { timeout: 20000 });
   await waitIdle();
@@ -213,7 +214,8 @@ try {
   check('Undo: page restored', undone === before, `${undone} vs ${before}`);
 
   // ---- Approval gate (deny, then allow)
-  await panel.locator('.modes button', { hasText: 'Act' }).click();
+  await panel.click('.mode-selector-btn');
+  await panel.locator('.modes button[data-mode="act"]').click();
   await panel.click('button[title="New chat"]');
   await page.reload();
   await send('delete the account');
@@ -245,7 +247,8 @@ try {
 
   // ---- CSV export
   await panel.click('button[title="New chat"]');
-  await panel.locator('.modes button', { hasText: 'Ask' }).click();
+  await panel.click('.mode-selector-btn');
+  await panel.locator('.modes button[data-mode="ask"]').click();
   const [download] = await Promise.all([
     panel.waitForEvent('download', { timeout: 15000 }),
     panel.click('button.suggest:has-text("Export tables")'),

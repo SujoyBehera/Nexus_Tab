@@ -19,7 +19,7 @@ export default function Settings(props: {
     <div className="settings">
       <div className="settings-header">
         <div className="settings-title-group">
-          <h3>ULTRON NEURAL CONFIGURATION</h3>
+          <h3>NEXUS TAB CONFIGURATION</h3>
           <span className="settings-badge">SYSTEM CONTROLS</span>
         </div>
         <button className="icon close-btn" onClick={props.onClose} title="Close Configuration">
