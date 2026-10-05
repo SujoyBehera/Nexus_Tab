@@ -34,8 +34,8 @@ Download ready-to-run packages directly from [**Releases**](https://github.com/S
 
 | Browser | Package | Installation (30 Seconds) |
 | :--- | :--- | :--- |
-| **🦊 Mozilla Firefox** | [**`ultron-0.1.0-firefox-signed.xpi`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-firefox-signed.xpi) | Officially signed by Mozilla! Drag & drop the `.xpi` file directly into any Firefox window and click **Add**. |
-| **🌐 Chrome / Brave / Edge** | [**`nexus-tab-0.1.0-chrome.zip`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-chrome.zip) | Extract zip ➔ open `chrome://extensions` ➔ toggle **Developer mode** ➔ click **Load unpacked** ➔ select folder. |
+| **🦊 Mozilla Firefox** | [**`nexus-tab-0.1.0-firefox-signed.xpi`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/nexus-tab-0.1.0-firefox-signed.xpi) | Officially signed by Mozilla! Drag & drop the `.xpi` file directly into any Firefox window and click **Add**. |
+| **🌐 Chrome / Brave / Edge** | [**`nexus-tab-0.1.0-chrome.zip`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/nexus-tab-0.1.0-chrome.zip) | Extract zip ➔ open `chrome://extensions` ➔ toggle **Developer mode** ➔ click **Load unpacked** ➔ select folder. |
 
 ---
 
@@ -44,14 +44,14 @@ Download ready-to-run packages directly from [**Releases**](https://github.com/S
 ### Option A: Direct Install (Recommended for End Users)
 
 #### 🦊 Mozilla Firefox (Permanent Signed Install)
-1. Download [**`ultron-0.1.0-firefox-signed.xpi`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-firefox-signed.xpi).
+1. Download [**`nexus-tab-0.1.0-firefox-signed.xpi`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/nexus-tab-0.1.0-firefox-signed.xpi).
 2. Drag and drop the downloaded `.xpi` file into Firefox (or open `about:addons` ➔ ⚙️ ➔ **Install Add-on From File...**).
 3. Click **Add** when prompted.
 4. Go to `about:addons` → **Nexus Tab** → **Permissions**, and verify **"Access your data for all websites"** is toggled **ON** (required by Firefox MV3 for sidebar and page interaction).
 5. Done! Nexus Tab stays permanently installed across all sessions and restarts.
 
 #### 🌐 Google Chrome / Brave / Microsoft Edge
-1. Download [**`nexus-tab-0.1.0-chrome.zip`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/ultron-0.1.0-chrome.zip).
+1. Download [**`nexus-tab-0.1.0-chrome.zip`**](https://github.com/SujoyBehera/Ultron/releases/download/v0.1.0/nexus-tab-0.1.0-chrome.zip).
 2. Unzip the file into a folder on your computer.
 3. In your browser, navigate to `chrome://extensions` (or `brave://extensions` / `edge://extensions`).
 4. Toggle on **Developer mode** in the top right.
