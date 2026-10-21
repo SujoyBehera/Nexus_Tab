@@ -100,3 +100,6 @@ $env:Path = "C:\Program Files\nodejs;" + $env:Path; npx.cmd wxt zip -b firefox -
 # Run Automated Playwright E2E Test Suite (16/16 verified)
 $env:Path = "C:\Program Files\nodejs;" + $env:Path; node e2e/run.mjs
 ```
+
+
+Co-authored-by: Anwesha Krishna <anwesha.k2906@gmail.com>
