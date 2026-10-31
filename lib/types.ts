@@ -121,7 +121,7 @@ export type PanelToBg =
   | { type: 'apply'; key: string; tabId: number; lang: string; code: string }
   | { type: 'undo'; key: string };
 
-export type StepStatus = 'running' | 'ok' | 'error' | 'denied';
+export type StepStatus = 'running' | 'ok' | 'error' | 'denied' | 'pivoting';
 
 /** Messages: background -> side panel. */
 export type BgToPanel =

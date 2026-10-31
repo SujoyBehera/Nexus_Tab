@@ -193,6 +193,7 @@ class Session {
     let loopRecoveries = 0;
     const maxRecoveries = 2;
     let recoveryNotice: string | null = null;
+    const quarantinedActions = new Map<string, number>();
 
     for (let step = 1; step <= config.maxSteps; step++) {
       if (signal.aborted) return;
@@ -239,9 +240,31 @@ class Session {
         return;
       }
 
+      for (const [qKey, expires] of quarantinedActions.entries()) {
+        if (step >= expires) quarantinedActions.delete(qKey);
+      }
+
       const label = this.describeAction(action, snap);
+      const actionSig = JSON.stringify(action);
+
+      // Guardrail: if model tries an action currently quarantined due to a loop, reject and prompt to pivot
+      if (quarantinedActions.has(actionSig)) {
+        this.send({
+          type: 'step',
+          id,
+          text: `Action quarantined: ${label}`,
+          status: 'pivoting',
+          thought: `Model attempted quarantined action "${label}". Blocking repeat execution to protect loop state.`,
+          timestamp: Date.now(),
+        });
+        recoveryNotice = `Action "${label}" is quarantined because it triggered a repetitive loop. You are strictly forbidden from executing it again. You MUST select an entirely different element or action.`;
+        trail.push(`${step}. [QUARANTINED]: "${label}" blocked -> Alternative action strictly required.`);
+        await sleep(250);
+        continue;
+      }
+
       // Scroll position is part of the key so repeated scrolling isn't mistaken for being stuck.
-      const key = JSON.stringify(action) + snap.url + snap.scrollY;
+      const key = actionSig + snap.url + snap.scrollY;
       repeats = key === lastKey ? repeats + 1 : 0;
       lastKey = key;
       if (repeats >= 2) {
@@ -249,6 +272,7 @@ class Session {
           loopRecoveries++;
           repeats = 0;
           lastKey = '';
+          quarantinedActions.set(actionSig, step + 2);
           recoveryNotice = `You have attempted "${label}" repeatedly without changing page state. You are stuck in an execution loop. Do NOT perform "${label}" again. Analyze the interactive elements and choose an alternative action (e.g. click a different element, use keyboard press, or scroll).`;
           trail.push(
             `${step}. [LOOP DETECTED]: "${label}" repeated without state change -> Initiating course correction.`,
@@ -257,8 +281,8 @@ class Session {
             type: 'step',
             id,
             text: `Loop detected on: ${label} (Pivoting...)`,
-            status: 'running',
-            thought: `Detected repetitive action on "${label}". Triggering reflection and course-correction prompt to select an alternative action.`,
+            status: 'pivoting',
+            thought: `Detected repetitive action on "${label}". Quarantining action and triggering reflection prompt to select an alternative action.`,
             timestamp: Date.now(),
           });
           await sleep(300);

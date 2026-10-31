@@ -872,9 +872,11 @@ export default function App() {
                                 <span className="step-idx">{String(idx + 1).padStart(2, '0')}</span>
                                 <span className="dot" />
                                 <span className="step-text">{s.text}</span>
-                                <span className={`step-tag ${s.verified === false ? 'unverified' : ''}`}>
+                                <span className={`step-tag ${s.status === 'pivoting' ? 'pivoting' : s.verified === false ? 'unverified' : ''}`}>
                                   {s.status === 'running'
                                     ? 'EXEC'
+                                    : s.status === 'pivoting'
+                                    ? 'PIVOT'
                                     : s.status === 'ok'
                                     ? s.verified === false
                                       ? 'UNVERIF'
