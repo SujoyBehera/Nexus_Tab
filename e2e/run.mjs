@@ -28,6 +28,7 @@ const PAGE = `<!doctype html><html><head><title>WebPilot Test Page</title>
 <h1>Hello from the test page</h1>
 <input id="q" placeholder="Search"> <button id="go">Go</button>
 <button id="del">Delete account</button>
+<button id="dead-btn">Unreactive Button</button>
 <div id="card-choice" style="cursor:pointer;padding:8px;border:1px solid #aaa;margin:10px 0;width:240px" role="radio" aria-checked="false">
   <span>Option C: Pointer Traversal</span>
   <input type="radio" id="inner-radio-c" name="traversal" style="opacity:0">
@@ -76,7 +77,11 @@ const llmServer = http.createServer((req, res) => {
       const prev = user.split('PREVIOUS ACTIONS:\n')[1] ?? '';
       const idx = (re) => Number(re.exec(user)?.[1]);
       let action;
-      if (goal.includes('custom radio')) {
+      if (goal.includes('unverified test')) {
+        action = prev.includes('WARNING: UNVERIFIED')
+          ? { type: 'done', message: 'Noticed unverified state.' }
+          : { type: 'click', index: idx(/^\[(\d+)\] button "Unreactive Button"/m) };
+      } else if (goal.includes('custom radio')) {
         action = prev.includes('Click')
           ? { type: 'done', message: 'Selected custom radio option.' }
           : { type: 'click', index: idx(/^\[(\d+)\] (?:radio|option|card) "Option C: Pointer Traversal"/m) };
@@ -210,6 +215,15 @@ try {
   check('Act: clicked custom card and toggled radio', choiceText === 'choice-c-activated', choiceText);
   const radioChecked = await page.evaluate(() => document.getElementById('inner-radio-c').checked);
   check('Act: nested input marked checked', radioChecked === true, String(radioChecked));
+
+  // ---- Verification Engine: Flag unverified actions
+  await panel.click('button[title="New chat"]');
+  await send('run unverified test');
+  await waitIdle();
+  const unverifiedBadge = await panel.locator('.step-tag.unverified').count();
+  check('Verify: unverified badge displayed in HUD', unverifiedBadge > 0, String(unverifiedBadge));
+  const assistantDone = await lastAssistant().innerText();
+  check('Verify: model reflected on unverified warning', assistantDone.includes('Noticed unverified state.'), assistantDone);
 
   // ---- Dev (logs seen + code written + Apply/Undo)
   await panel.click('.mode-selector-btn');
