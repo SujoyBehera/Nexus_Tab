@@ -190,6 +190,9 @@ class Session {
     let parseFails = 0;
     let lastKey = '';
     let repeats = 0;
+    let loopRecoveries = 0;
+    const maxRecoveries = 2;
+    let recoveryNotice: string | null = null;
 
     for (let step = 1; step <= config.maxSteps; step++) {
       if (signal.aborted) return;
@@ -200,11 +203,18 @@ class Session {
       const snap = await this.tab<Snapshot>(tabId, { kind: 'snapshot' });
 
       // Stateless per step: the trail replaces chat history, which keeps prompts small.
-      const user =
+      let user =
         `GOAL: ${goal}\n\nPAGE: ${snap.title}\nURL: ${snap.url}\n` +
         `SCROLL: ${snap.scrollY}/${snap.scrollMax}px\n\nVISIBLE TEXT:\n${snap.text}\n\n` +
         `INTERACTIVE ELEMENTS:\n${snap.lines || '(none visible)'}\n\n` +
-        `PREVIOUS ACTIONS:\n${trail.slice(-8).join('\n') || '(none yet)'}\n\nReply with JSON only.`;
+        `PREVIOUS ACTIONS:\n${trail.slice(-8).join('\n') || '(none yet)'}\n\n`;
+
+      if (recoveryNotice) {
+        user += `⚠️ CRITICAL SYSTEM INTERVENTION:\n${recoveryNotice}\n\n`;
+        recoveryNotice = null;
+      }
+
+      user += 'Reply with JSON only.';
 
       const id = this.nextId++;
       this.send({ type: 'step', id, text: 'Thinking…', status: 'running', timestamp: Date.now() });
@@ -235,9 +245,29 @@ class Session {
       repeats = key === lastKey ? repeats + 1 : 0;
       lastKey = key;
       if (repeats >= 2) {
-        this.send({ type: 'step', id, text: `Stuck repeating: ${label}`, status: 'error', thought: parsed.thought });
-        this.send({ type: 'token', text: 'I got stuck repeating the same action, so I stopped. Try rephrasing the goal.' });
-        return;
+        if (loopRecoveries < maxRecoveries) {
+          loopRecoveries++;
+          repeats = 0;
+          lastKey = '';
+          recoveryNotice = `You have attempted "${label}" repeatedly without changing page state. You are stuck in an execution loop. Do NOT perform "${label}" again. Analyze the interactive elements and choose an alternative action (e.g. click a different element, use keyboard press, or scroll).`;
+          trail.push(
+            `${step}. [LOOP DETECTED]: "${label}" repeated without state change -> Initiating course correction.`,
+          );
+          this.send({
+            type: 'step',
+            id,
+            text: `Loop detected on: ${label} (Pivoting...)`,
+            status: 'running',
+            thought: `Detected repetitive action on "${label}". Triggering reflection and course-correction prompt to select an alternative action.`,
+            timestamp: Date.now(),
+          });
+          await sleep(300);
+          continue;
+        } else {
+          this.send({ type: 'step', id, text: `Stuck repeating: ${label}`, status: 'error', thought: parsed.thought });
+          this.send({ type: 'token', text: 'I got stuck repeating the same action and recovery attempts were exhausted. Try rephrasing the goal.' });
+          return;
+        }
       }
 
       // Permission gate for potentially irreversible actions.

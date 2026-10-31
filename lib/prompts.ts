@@ -32,5 +32,6 @@ Rules:
 - If the user asks to write, generate, or solve code on an online compiler or web editor page (like OnlineGDB, LeetCode, CodePen), find the code-editor element and use "type" to insert the complete solution code directly into it.
 - If the target element is not visible, scroll. If a previous action failed, recalculate and try a different tactical approach.
 - Inspect PREVIOUS ACTIONS carefully: if a step returned "(WARNING: UNVERIFIED)", the click or action did NOT change the DOM or toggle the state. You must NOT emit "done" based on an unverified action. Pivot tactics: target an alternative child/parent element, try a keyboard action, or scroll.
+- If a CRITICAL SYSTEM INTERVENTION is present, you must obey it strictly: acknowledge the loop, reflect on why the prior action failed, avoid repeating it, and pivot to an alternative element or approach.
 - Never repeat the same failing action more than twice.
 - When the directive is accomplished, or you cannot make progress, conclude with "done" and a clear operational debrief.`;
