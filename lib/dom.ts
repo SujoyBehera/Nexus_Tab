@@ -360,7 +360,7 @@ function setNativeValue(el: HTMLInputElement | HTMLTextAreaElement, value: strin
 function fire(el: Element, type: string, init: Record<string, unknown> = {}): boolean {
   const opts = { bubbles: true, cancelable: true, composed: true, view: window, ...init };
   const ev = type.startsWith('pointer')
-    ? new PointerEvent(type, { ...opts, pointerType: 'mouse', isPrimary: true })
+    ? new PointerEvent(type, { ...opts, pointerType: 'mouse', isPrimary: true, pointerId: 1 })
     : type.startsWith('key')
       ? new KeyboardEvent(type, opts)
       : new MouseEvent(type, opts);
@@ -368,13 +368,91 @@ function fire(el: Element, type: string, init: Record<string, unknown> = {}): bo
 }
 
 function clickEl(el: Element): void {
-  (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'center' });
+  try {
+    (el as HTMLElement).scrollIntoView({ block: 'center', inline: 'nearest' });
+  } catch {
+    /* ignore scroll errors */
+  }
+
   const r = el.getBoundingClientRect();
-  const pos = { clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, button: 0 };
-  ['pointerover', 'mouseover', 'pointerdown', 'mousedown'].forEach((t) => fire(el, t, pos));
-  (el as HTMLElement).focus?.();
-  ['pointerup', 'mouseup'].forEach((t) => fire(el, t, pos));
-  (el as HTMLElement).click();
+  const clientX = Math.round(r.left + Math.max(1, r.width / 2));
+  const clientY = Math.round(r.top + Math.max(1, r.height / 2));
+  const screenX = window.screenX + clientX;
+  const screenY = window.screenY + clientY;
+
+  const basePos = {
+    clientX,
+    clientY,
+    screenX,
+    screenY,
+    pageX: clientX + window.scrollX,
+    pageY: clientY + window.scrollY,
+  };
+
+  const downPos = { ...basePos, button: 0, buttons: 1, detail: 1, pressure: 0.5 };
+  const upPos = { ...basePos, button: 0, buttons: 0, detail: 1, pressure: 0 };
+
+  // 1. Pointer & Mouse Hover sequence
+  fire(el, 'pointerover', { ...basePos, button: 0, buttons: 0 });
+  fire(el, 'mouseover', { ...basePos, button: 0, buttons: 0 });
+  fire(el, 'pointerenter', { ...basePos, button: 0, buttons: 0 });
+  fire(el, 'mouseenter', { ...basePos, button: 0, buttons: 0 });
+
+  // 2. Mouse/Pointer Down
+  fire(el, 'pointerdown', downPos);
+  fire(el, 'mousedown', downPos);
+
+  // 3. Focus
+  if (el instanceof HTMLElement && typeof el.focus === 'function') {
+    try {
+      el.focus();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  // 4. Mouse/Pointer Up
+  fire(el, 'pointerup', upPos);
+  fire(el, 'mouseup', upPos);
+
+  // 5. Click Event
+  fire(el, 'click', upPos);
+
+  // 6. Native click trigger
+  if (el instanceof HTMLElement) {
+    try {
+      el.click();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  // 7. Nested radio / checkbox fallback: if wrapper card clicked, ensure input state activates
+  const nestedInput = el.querySelector<HTMLInputElement>(
+    'input[type=radio], input[type=checkbox]'
+  );
+  if (nestedInput && !nestedInput.checked) {
+    try {
+      nestedInput.focus();
+      nestedInput.click();
+      nestedInput.dispatchEvent(new Event('input', { bubbles: true }));
+      nestedInput.dispatchEvent(new Event('change', { bubbles: true }));
+    } catch {
+      /* ignore */
+    }
+  }
+
+  // 8. Label htmlFor association fallback
+  if (el instanceof HTMLLabelElement && el.htmlFor) {
+    const targetInput = document.getElementById(el.htmlFor);
+    if (targetInput instanceof HTMLInputElement && !targetInput.checked) {
+      try {
+        targetInput.click();
+      } catch {
+        /* ignore */
+      }
+    }
+  }
 }
 
 function pressKey(target: Element, key: string): void {
