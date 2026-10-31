@@ -138,7 +138,13 @@ function describe(el: Element, i: number): ElementInfo {
               ? 'label'
               : tag === 'button'
                 ? 'button'
-                : 'card');
+                : tag === 'input'
+                  ? 'input'
+                  : tag === 'textarea'
+                    ? 'textarea'
+                    : tag === 'select'
+                      ? 'select'
+                      : 'card');
 
   if (role === 'card' && !el.matches(INTERACTIVE)) {
     role = 'option';

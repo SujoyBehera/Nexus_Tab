@@ -28,12 +28,22 @@ const PAGE = `<!doctype html><html><head><title>WebPilot Test Page</title>
 <h1>Hello from the test page</h1>
 <input id="q" placeholder="Search"> <button id="go">Go</button>
 <button id="del">Delete account</button>
+<div id="card-choice" style="cursor:pointer;padding:8px;border:1px solid #aaa;margin:10px 0;width:240px" role="radio" aria-checked="false">
+  <span>Option C: Pointer Traversal</span>
+  <input type="radio" id="inner-radio-c" name="traversal" style="opacity:0">
+</div>
+<div id="choice-status">none</div>
 <div id="out"></div>
 <table><tr><th>Name</th><th>Qty</th></tr><tr><td>Apple, red</td><td>3</td></tr><tr><td>Pear</td><td>5</td></tr></table>
 <div style="height:3000px"></div>
 <script>
  go.onclick=()=>{ out.textContent='Searched: '+q.value; console.error('test-error from page'); fetch('/missing'); };
  del.onclick=()=>{ out.textContent='deleted'; };
+ document.getElementById('card-choice').onclick = () => {
+   document.getElementById('card-choice').setAttribute('aria-checked', 'true');
+   document.getElementById('inner-radio-c').checked = true;
+   document.getElementById('choice-status').textContent = 'choice-c-activated';
+ };
 </script></body></html>`;
 
 const pageServer = http.createServer((req, res) => {
@@ -66,7 +76,11 @@ const llmServer = http.createServer((req, res) => {
       const prev = user.split('PREVIOUS ACTIONS:\n')[1] ?? '';
       const idx = (re) => Number(re.exec(user)?.[1]);
       let action;
-      if (goal.includes('delete')) {
+      if (goal.includes('custom radio')) {
+        action = prev.includes('Click')
+          ? { type: 'done', message: 'Selected custom radio option.' }
+          : { type: 'click', index: idx(/^\[(\d+)\] (?:radio|option|card) "Option C: Pointer Traversal"/m) };
+      } else if (goal.includes('delete')) {
         action = prev.includes('Click')
           ? { type: 'done', message: 'Finished delete task.' }
           : { type: 'click', index: idx(/^\[(\d+)\] button "Delete account"/m) };
@@ -187,6 +201,15 @@ try {
   await panel.click('.save-macro button.primary');
   const stored = await sw.evaluate(async () => (await chrome.storage.local.get('macros')).macros);
   check('Macro: saved with 2 steps', stored?.length === 1 && stored[0].steps.length === 2, JSON.stringify(stored));
+
+  // ---- Custom Card / Radio click verification
+  await panel.click('button[title="New chat"]');
+  await send('select custom radio');
+  await waitIdle();
+  const choiceText = await page.locator('#choice-status').innerText();
+  check('Act: clicked custom card and toggled radio', choiceText === 'choice-c-activated', choiceText);
+  const radioChecked = await page.evaluate(() => document.getElementById('inner-radio-c').checked);
+  check('Act: nested input marked checked', radioChecked === true, String(radioChecked));
 
   // ---- Dev (logs seen + code written + Apply/Undo)
   await panel.click('.mode-selector-btn');
