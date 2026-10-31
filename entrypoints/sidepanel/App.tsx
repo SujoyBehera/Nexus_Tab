@@ -324,7 +324,9 @@ export default function App() {
     setMessages((prev) => {
       if (prev.length === 0) return prev;
       const copy = [...prev];
-      copy[copy.length - 1] = fn(copy[copy.length - 1]);
+      const last = copy[copy.length - 1];
+      if (!last) return prev;
+      copy[copy.length - 1] = fn(last);
       return copy;
     });
   };
@@ -346,6 +348,7 @@ export default function App() {
           if (prev.length === 0) return prev;
           const copy = [...prev];
           const last = copy[copy.length - 1];
+          if (!last) return prev;
           const exists = last.steps.some((s) => s.id === m.id);
           const nextSteps = exists
             ? last.steps.map((s) => (s.id === m.id ? { ...s, ...m } : s))

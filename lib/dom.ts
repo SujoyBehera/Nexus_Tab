@@ -7,6 +7,7 @@ const INTERACTIVE = [
   'textarea',
   'select',
   'summary',
+  'label',
   '[role=button]',
   '[role=link]',
   '[role=checkbox]',
@@ -25,6 +26,10 @@ const INTERACTIVE = [
   '.cm-content',
   '.cm-editor',
   '[onclick]',
+  '[data-action]',
+  '[data-clickable="true"]',
+  '[aria-checked]',
+  '[aria-selected]',
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
@@ -36,10 +41,27 @@ const clip = (s: string, n: number): string => {
   return t.length > n ? t.slice(0, n - 1) + '…' : t;
 };
 
-/** Collects interactive elements, piercing open shadow roots. */
+/** Collects interactive elements, piercing open shadow roots and detecting custom styled cards. */
 function collect(root: ParentNode, out: Element[]): void {
   root.querySelectorAll('*').forEach((el) => {
-    if (el.matches(INTERACTIVE)) out.push(el);
+    let matched = el.matches(INTERACTIVE);
+    if (!matched && el instanceof HTMLElement) {
+      const tag = el.tagName.toLowerCase();
+      if (['div', 'li', 'span', 'article', 'section', 'tr'].includes(tag)) {
+        try {
+          const cs = getComputedStyle(el);
+          if (cs.cursor === 'pointer') {
+            const r = el.getBoundingClientRect();
+            if (r.width >= 12 && r.height >= 12 && r.width < innerWidth * 0.95) {
+              matched = true;
+            }
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+    }
+    if (matched) out.push(el);
     const sr = (el as HTMLElement).shadowRoot;
     if (sr) collect(sr, out);
   });
@@ -63,14 +85,14 @@ function inViewport(el: Element): boolean {
 
 function labelOf(el: Element): string {
   const aria = el.getAttribute('aria-label');
-  if (aria) return clip(aria, 80);
+  if (aria) return clip(aria, 140);
   const by = el.getAttribute('aria-labelledby');
   if (by) {
     const t = by
       .split(/\s+/)
       .map((id) => document.getElementById(id)?.textContent ?? '')
       .join(' ');
-    if (t.trim()) return clip(t, 80);
+    if (t.trim()) return clip(t, 140);
   }
   if (
     el instanceof HTMLInputElement ||
@@ -78,32 +100,63 @@ function labelOf(el: Element): string {
     el instanceof HTMLSelectElement
   ) {
     const l = el.labels?.[0]?.textContent;
-    if (l?.trim()) return clip(l, 80);
-    if ('placeholder' in el && el.placeholder) return clip(el.placeholder, 80);
+    if (l?.trim()) return clip(l, 140);
+    if ('placeholder' in el && el.placeholder) return clip(el.placeholder, 140);
     if (
       el instanceof HTMLInputElement &&
       ['button', 'submit', 'reset'].includes(el.type) &&
       el.value
     ) {
-      return clip(el.value, 80);
+      return clip(el.value, 140);
     }
     return el.name || el.id || '';
   }
   const text = (el as HTMLElement).innerText || el.textContent || '';
-  if (text.trim()) return clip(text, 80);
+  if (text.trim()) return clip(text, 140);
   const alt = el.querySelector('img[alt]')?.getAttribute('alt');
-  if (alt) return clip(alt, 80);
-  return clip(el.getAttribute('title') || el.getAttribute('alt') || '', 80);
+  if (alt) return clip(alt, 140);
+  return clip(el.getAttribute('title') || el.getAttribute('alt') || '', 140);
 }
 
 function describe(el: Element, i: number): ElementInfo {
   const tag = el.tagName.toLowerCase();
   const isEditor = !!el.closest('.ace_editor, .monaco-editor, .cm-editor, .cm-content, .CodeMirror');
+  const childRadio = el.querySelector('input[type=radio]') as HTMLInputElement | null;
+  const childCheckbox = el.querySelector('input[type=checkbox]') as HTMLInputElement | null;
+  const roleAttr = el.getAttribute('role');
+
+  let role = isEditor
+    ? 'code-editor'
+    : roleAttr ||
+      (childRadio
+        ? 'radio'
+        : childCheckbox
+          ? 'checkbox'
+          : tag === 'a'
+            ? 'link'
+            : tag === 'label'
+              ? 'label'
+              : tag === 'button'
+                ? 'button'
+                : 'card');
+
+  if (role === 'card' && !el.matches(INTERACTIVE)) {
+    role = 'option';
+  }
+
   const info: ElementInfo = {
     i,
-    role: isEditor ? 'code-editor' : el.getAttribute('role') || (tag === 'a' ? 'link' : tag),
+    role,
     label: isEditor ? (labelOf(el) || 'Code Editor') : labelOf(el),
   };
+
+  const isChecked =
+    (childRadio && childRadio.checked) ||
+    (childCheckbox && childCheckbox.checked) ||
+    el.getAttribute('aria-checked') === 'true' ||
+    el.getAttribute('aria-selected') === 'true' ||
+    /(^|\s)(selected|active|checked)(\s|$)/i.test(el.className);
+
   if (el instanceof HTMLInputElement) {
     info.type = el.type;
     if (el.type === 'checkbox' || el.type === 'radio') {
@@ -111,6 +164,8 @@ function describe(el: Element, i: number): ElementInfo {
     } else if (el.value && el.type !== 'password' && !['button', 'submit'].includes(el.type)) {
       info.value = clip(el.value, 40);
     }
+  } else if (childRadio || role === 'radio' || childCheckbox || role === 'checkbox') {
+    info.extra = isChecked ? 'checked' : 'unchecked';
   } else if (el instanceof HTMLTextAreaElement) {
     if (el.value) info.value = clip(el.value, 40);
   } else if (el instanceof HTMLSelectElement) {
@@ -127,7 +182,10 @@ function describe(el: Element, i: number): ElementInfo {
     } catch {
       /* ignore */
     }
+  } else if (isChecked) {
+    info.extra = 'selected';
   }
+
   return info;
 }
 
@@ -156,10 +214,21 @@ export function snapshot(maxElements = 120, textMax = 1500): Snapshot {
   for (const el of found) {
     if (elements.length >= maxElements) break;
     if (isDisabled(el) || !inViewport(el)) continue;
-    const wrapper = el.parentElement?.closest('a[href],button');
-    if (wrapper && included.has(wrapper) && !/^(input|select|textarea)$/i.test(el.tagName)) {
+
+    const ancestor = el.parentElement?.closest('a[href],button,label,[role=button],[role=radio],[role=checkbox]');
+    if (ancestor && included.has(ancestor) && !/^(input|select|textarea)$/i.test(el.tagName)) {
       continue;
     }
+
+    let isNestedInCard = false;
+    for (const inc of included) {
+      if (inc !== el && inc.contains(el) && !/^(input|select|textarea)$/i.test(el.tagName)) {
+        isNestedInCard = true;
+        break;
+      }
+    }
+    if (isNestedInCard) continue;
+
     included.add(el);
     registry.push(el);
     elements.push(describe(el, registry.length));
