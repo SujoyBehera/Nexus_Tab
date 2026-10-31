@@ -266,19 +266,25 @@ class Session {
         timestamp: stepStart,
       });
       const result = await this.execute(action, tabId);
+      const isVerified = result.verified !== false;
       this.send({
         type: 'step',
         id,
         text: label,
         status: result.ok ? 'ok' : 'error',
+        verified: isVerified,
         thought: parsed.thought,
         action: actType,
         target: targetDesc,
         timestamp: Date.now(),
       });
-      trail.push(
-        `${step}. ${label} -> ${result.ok ? 'ok' : 'FAILED: ' + result.error}${result.note ? ' (' + result.note + ')' : ''}`,
-      );
+      let outcome = result.ok ? 'ok' : 'FAILED: ' + result.error;
+      if (result.ok && !isVerified) {
+        outcome += ` (WARNING: UNVERIFIED - ${result.note || 'no state or DOM mutation detected'})`;
+      } else if (result.note) {
+        outcome += ` (${result.note})`;
+      }
+      trail.push(`${step}. ${label} -> ${outcome}`);
       if (result.ok) {
         const rec = this.toMacroStep(action, snap);
         if (rec) recorded.push(rec);

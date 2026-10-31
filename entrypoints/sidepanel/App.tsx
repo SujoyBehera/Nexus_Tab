@@ -21,6 +21,7 @@ interface Step {
   id: number;
   text: string;
   status: StepStatus;
+  verified?: boolean;
   thought?: string;
   action?: string;
   target?: string;
@@ -358,6 +359,7 @@ export default function App() {
                   id: m.id,
                   text: m.text,
                   status: m.status,
+                  verified: m.verified,
                   thought: m.thought,
                   action: m.action,
                   target: m.target,
@@ -870,11 +872,13 @@ export default function App() {
                                 <span className="step-idx">{String(idx + 1).padStart(2, '0')}</span>
                                 <span className="dot" />
                                 <span className="step-text">{s.text}</span>
-                                <span className="step-tag">
+                                <span className={`step-tag ${s.verified === false ? 'unverified' : ''}`}>
                                   {s.status === 'running'
                                     ? 'EXEC'
                                     : s.status === 'ok'
-                                    ? 'DONE'
+                                    ? s.verified === false
+                                      ? 'UNVERIF'
+                                      : 'DONE'
                                     : s.status === 'error'
                                     ? 'FAIL'
                                     : 'HALT'}
