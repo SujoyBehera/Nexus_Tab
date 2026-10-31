@@ -62,6 +62,7 @@ export type PageAction =
 
 export interface ActionResult {
   ok: boolean;
+  verified?: boolean;
   note?: string;
   error?: string;
 }
@@ -130,6 +131,7 @@ export type BgToPanel =
       id: number;
       text: string;
       status: StepStatus;
+      verified?: boolean;
       thought?: string;
       action?: string;
       target?: string;

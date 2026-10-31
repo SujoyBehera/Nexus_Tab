@@ -473,23 +473,149 @@ function pressKey(target: Element, key: string): void {
   }
 }
 
+interface ElementFingerprint {
+  inDOM: boolean;
+  checked: boolean;
+  ariaChecked: string | null;
+  ariaSelected: string | null;
+  ariaExpanded: string | null;
+  value: string | null;
+  className: string;
+  url: string;
+  scrollY: number;
+  childCount: number;
+}
+
+function captureFingerprint(el?: Element | null): ElementFingerprint {
+  const url = location.href;
+  const scrollY = window.scrollY;
+  if (!el || !el.isConnected) {
+    return {
+      inDOM: false,
+      checked: false,
+      ariaChecked: null,
+      ariaSelected: null,
+      ariaExpanded: null,
+      value: null,
+      className: '',
+      url,
+      scrollY,
+      childCount: document.body?.children.length ?? 0,
+    };
+  }
+
+  const childInput = el.querySelector<HTMLInputElement>('input[type=radio], input[type=checkbox]');
+  const checked = el instanceof HTMLInputElement
+    ? el.checked
+    : childInput
+      ? childInput.checked
+      : el.getAttribute('aria-checked') === 'true';
+
+  const value = el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement
+    ? el.value
+    : null;
+
+  return {
+    inDOM: true,
+    checked,
+    ariaChecked: el.getAttribute('aria-checked'),
+    ariaSelected: el.getAttribute('aria-selected'),
+    ariaExpanded: el.getAttribute('aria-expanded'),
+    value,
+    className: el.className || '',
+    url,
+    scrollY,
+    childCount: el.parentElement?.children.length ?? document.body?.children.length ?? 0,
+  };
+}
+
+async function verifyStateChange(
+  pre: ElementFingerprint,
+  el: Element | null,
+  a: PageAction,
+): Promise<{ verified: boolean; note?: string }> {
+  // Allow microtask ticks for React / Vue state propagation
+  await new Promise((r) => setTimeout(r, 60));
+
+  if (location.href !== pre.url) {
+    return { verified: true, note: `Navigated to ${location.pathname}` };
+  }
+
+  if (a.type === 'scroll') {
+    const diff = Math.abs(window.scrollY - pre.scrollY);
+    return diff > 5
+      ? { verified: true, note: `Scrolled to ${Math.round(window.scrollY)}px` }
+      : { verified: false, note: 'Scroll did not alter page viewport position' };
+  }
+
+  if (el && !el.isConnected) {
+    return { verified: true, note: 'Element consumed or updated in DOM' };
+  }
+
+  if (!el) {
+    return { verified: true };
+  }
+
+  const post = captureFingerprint(el);
+
+  if (post.checked !== pre.checked) {
+    return { verified: true, note: `Checked state toggled to ${post.checked}` };
+  }
+  if (post.ariaChecked !== pre.ariaChecked) {
+    return { verified: true, note: `aria-checked changed to "${post.ariaChecked}"` };
+  }
+  if (post.ariaSelected !== pre.ariaSelected) {
+    return { verified: true, note: `aria-selected changed to "${post.ariaSelected}"` };
+  }
+  if (post.ariaExpanded !== pre.ariaExpanded) {
+    return { verified: true, note: `aria-expanded changed to "${post.ariaExpanded}"` };
+  }
+  if (post.value !== pre.value) {
+    return { verified: true, note: 'Value updated' };
+  }
+  if (post.className !== pre.className) {
+    return { verified: true, note: 'Element style classes mutated' };
+  }
+  if (post.childCount !== pre.childCount) {
+    return { verified: true, note: 'DOM tree mutated' };
+  }
+
+  // If action was click, and nothing in DOM, classes or attributes changed:
+  if (a.type === 'click') {
+    return {
+      verified: false,
+      note: 'Click dispatched, but no DOM state change (checked/class/DOM) was detected',
+    };
+  }
+
+  return { verified: true };
+}
+
 export async function runAction(a: PageAction): Promise<ActionResult> {
   try {
+    let targetEl: Element | null = null;
+    if ('index' in a && typeof a.index === 'number') {
+      const resolved = getEl(a.index);
+      if (typeof resolved === 'string') return { ok: false, error: resolved };
+      targetEl = resolved;
+    }
+
+    const preState = captureFingerprint(targetEl);
+
     switch (a.type) {
       case 'click': {
-        const el = getEl(a.index);
-        if (typeof el === 'string') return { ok: false, error: el };
-        highlight(el);
-        clickEl(el);
-        return { ok: true };
+        if (!targetEl) return { ok: false, error: 'Target element missing.' };
+        highlight(targetEl);
+        clickEl(targetEl);
+        const v = await verifyStateChange(preState, targetEl, a);
+        return { ok: true, verified: v.verified, note: v.note };
       }
       case 'type': {
-        const found = getEl(a.index);
-        if (typeof found === 'string') return { ok: false, error: found };
-        highlight(found);
+        if (!targetEl) return { ok: false, error: 'Target element missing.' };
+        highlight(targetEl);
 
         // Check if typing into an in-page code editor (Ace / Monaco / CodeMirror)
-        if (found.closest('.ace_editor, .monaco-editor, .cm-editor, .cm-content, .CodeMirror') || document.querySelector('.ace_editor, .monaco-editor, .CodeMirror')) {
+        if (targetEl.closest('.ace_editor, .monaco-editor, .cm-editor, .cm-content, .CodeMirror') || document.querySelector('.ace_editor, .monaco-editor, .CodeMirror')) {
           try {
             window.postMessage(
               {
@@ -504,9 +630,9 @@ export async function runAction(a: PageAction): Promise<ActionResult> {
           }
         }
 
-        const el = found.matches('input,textarea,[contenteditable]')
-          ? found
-          : (found.querySelector('input,textarea,[contenteditable]') ?? found);
+        const el = targetEl.matches('input,textarea,[contenteditable]')
+          ? targetEl
+          : (targetEl.querySelector('input,textarea,[contenteditable]') ?? targetEl);
         (el as HTMLElement).focus();
         if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
           const next = a.clear === false ? el.value + a.text : a.text;
@@ -530,42 +656,43 @@ export async function runAction(a: PageAction): Promise<ActionResult> {
           }
         }
         if (a.submit) pressKey(el, 'Enter');
-        return { ok: true };
+        const v = await verifyStateChange(preState, targetEl, a);
+        return { ok: true, verified: v.verified, note: v.note };
       }
       case 'select': {
-        const el = getEl(a.index);
-        if (typeof el === 'string') return { ok: false, error: el };
-        if (!(el instanceof HTMLSelectElement)) {
+        if (!targetEl) return { ok: false, error: 'Target element missing.' };
+        if (!(targetEl instanceof HTMLSelectElement)) {
           return { ok: false, error: `Element [${a.index}] is not a <select>.` };
         }
         const want = a.option.toLowerCase();
-        const opt = Array.from(el.options).find(
+        const opt = Array.from(targetEl.options).find(
           (o) => o.text.toLowerCase() === want || o.value.toLowerCase() === want,
-        ) ?? Array.from(el.options).find((o) => o.text.toLowerCase().includes(want));
+        ) ?? Array.from(targetEl.options).find((o) => o.text.toLowerCase().includes(want));
         if (!opt) return { ok: false, error: `No option matching "${a.option}".` };
-        highlight(el);
-        el.value = opt.value;
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        el.dispatchEvent(new Event('change', { bubbles: true }));
-        return { ok: true };
+        highlight(targetEl);
+        targetEl.value = opt.value;
+        targetEl.dispatchEvent(new Event('input', { bubbles: true }));
+        targetEl.dispatchEvent(new Event('change', { bubbles: true }));
+        const v = await verifyStateChange(preState, targetEl, a);
+        return { ok: true, verified: v.verified, note: v.note };
       }
       case 'press': {
         let target: Element = document.activeElement ?? document.body;
-        if (a.index !== undefined) {
-          const el = getEl(a.index);
-          if (typeof el === 'string') return { ok: false, error: el };
-          target = el;
-          (el as HTMLElement).focus?.();
+        if (a.index !== undefined && targetEl) {
+          target = targetEl;
+          (targetEl as HTMLElement).focus?.();
         }
         pressKey(target, a.key);
-        return { ok: true };
+        const v = await verifyStateChange(preState, targetEl, a);
+        return { ok: true, verified: v.verified, note: v.note };
       }
       case 'scroll': {
         const page = Math.round(innerHeight * 0.8);
         if (a.direction === 'top') scrollTo({ top: 0 });
         else if (a.direction === 'bottom') scrollTo({ top: document.documentElement.scrollHeight });
         else scrollBy({ top: a.direction === 'down' ? page : -page });
-        return { ok: true };
+        const v = await verifyStateChange(preState, null, a);
+        return { ok: true, verified: v.verified, note: v.note };
       }
     }
   } catch (e) {
