@@ -11,6 +11,10 @@ Compatible with **Brave**, **Google Chrome**, **Microsoft Edge**, and **Mozilla 
 
 ## ⚡ What's New in the Nexus Tab Edition
 
+* **v0.2.1 Event Pipeline & Custom Component Grounding Engine**:
+  * **Custom React / Vue Card Grounding**: Intelligently identifies styled `<div>` cards, custom radio groups, option tiles, and `cursor: pointer` interactive elements.
+  * **Realistic Native Event Pipeline**: Dispatches spec-compliant pointer & mouse sequences (`pointerover` → `mouseover` → `pointerdown` → `mousedown` → `focus` → `pointerup` → `mouseup` → `click`) with accurate coordinates, pressure, and button state.
+  * **Dual-Dispatch Control Synchronization**: Automatically detects and activates nested native `<input type="radio">` or `<input type="checkbox">` elements when clicking custom wrapper cards.
 * **Crystalline Cybernetic Aesthetic**:
   * Deep midnight sapphire chassis (`#070a13`) with electric cyan glowing accents (`#0ea5e9`, `#38bdf8`) and tactical telemetry highlights.
   * Custom crystalline circuit emblem icon and animated halo pulse indicator.
