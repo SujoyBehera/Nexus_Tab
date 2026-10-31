@@ -36,31 +36,44 @@ Compatible with **Brave**, **Google Chrome**, **Microsoft Edge**, and **Mozilla 
 
 Download ready-to-run packages directly from [**Releases**](https://github.com/SujoyBehera/Nexus_Tab/releases):
 
-| Browser | Package | Installation (30 Seconds) |
+| Browser | Package | Installation |
 | :--- | :--- | :--- |
-| **🦊 Mozilla Firefox** | [**`nexus-tab-0.1.0-firefox-signed.xpi`**](https://github.com/SujoyBehera/Nexus_Tab/releases/download/v0.1.0/nexus-tab-0.1.0-firefox-signed.xpi) | Officially signed by Mozilla! Drag & drop the `.xpi` file directly into any Firefox window and click **Add**. |
-| **🌐 Chrome / Brave / Edge** | [**`nexus-tab-0.1.0-chrome.zip`**](https://github.com/SujoyBehera/Nexus_Tab/releases/download/v0.1.0/nexus-tab-0.1.0-chrome.zip) | Extract zip ➔ open `chrome://extensions` ➔ toggle **Developer mode** ➔ click **Load unpacked** ➔ select folder. |
+| **🌐 Chrome / Brave / Edge** | [**`nexus-tab-0.2.1-chrome.zip`**](https://github.com/SujoyBehera/Nexus_Tab/releases/download/v0.2.1/nexus-tab-0.2.1-chrome.zip) | Extract zip ➔ open `chrome://extensions` ➔ toggle **Developer mode** ➔ click **Load unpacked** ➔ select `.output/chrome-mv3`. |
+| **🦊 Mozilla Firefox** | [**`nexus-tab-0.2.1-firefox.zip`**](https://github.com/SujoyBehera/Nexus_Tab/releases/download/v0.2.1/nexus-tab-0.2.1-firefox.zip) | Open `about:debugging#/runtime/this-firefox` ➔ click **Load Temporary Add-on...** ➔ select `manifest.json` or zip. *(See below for permanent install).* |
 
 ---
 
 ## 📦 Quick Start & Installation
 
-### Option A: Direct Install (Recommended for End Users)
-
-#### 🦊 Mozilla Firefox (Permanent Signed Install)
-1. Download [**`nexus-tab-0.1.0-firefox-signed.xpi`**](https://github.com/SujoyBehera/Nexus_Tab/releases/download/v0.1.0/nexus-tab-0.1.0-firefox-signed.xpi).
-2. Drag and drop the downloaded `.xpi` file into Firefox (or open `about:addons` ➔ ⚙️ ➔ **Install Add-on From File...**).
-3. Click **Add** when prompted.
-4. Go to `about:addons` → **Nexus Tab** → **Permissions**, and verify **"Access your data for all websites"** is toggled **ON** (required by Firefox MV3 for sidebar and page interaction).
-5. Done! Nexus Tab stays permanently installed across all sessions and restarts.
+### Option A: Direct Install
 
 #### 🌐 Google Chrome / Brave / Microsoft Edge
-1. Download [**`nexus-tab-0.1.0-chrome.zip`**](https://github.com/SujoyBehera/Nexus_Tab/releases/download/v0.1.0/nexus-tab-0.1.0-chrome.zip).
+1. Download [**`nexus-tab-0.2.1-chrome.zip`**](https://github.com/SujoyBehera/Nexus_Tab/releases/download/v0.2.1/nexus-tab-0.2.1-chrome.zip).
 2. Unzip the file into a folder on your computer.
 3. In your browser, navigate to `chrome://extensions` (or `brave://extensions` / `edge://extensions`).
 4. Toggle on **Developer mode** in the top right.
-5. Click **Load unpacked** in the top left and select the unzipped folder.
+5. Click **Load unpacked** in the top left and select the unzipped folder (or `.output/chrome-mv3`).
 6. Click the Nexus Tab emblem in your extension toolbar to launch the cybernetic side panel.
+
+#### 🦊 Mozilla Firefox
+
+##### Method 1: Instant Load (Testing & Development)
+1. In Firefox, navigate to `about:debugging#/runtime/this-firefox`.
+2. Click **"Load Temporary Add-on..."**.
+3. Select `manifest.json` from `.output/firefox-mv3/` (or select `nexus-tab-0.2.1-firefox.zip`).
+4. Nexus Tab will load instantly into your browser.
+
+##### Method 2: Permanent Install Across Restarts
+Because standard Firefox enforces mandatory code signing:
+* **Option 2A (Permanent via Free Mozilla AMO Self-Signing):**
+  1. Open [**Mozilla Developer Hub**](https://addons.mozilla.org/developers/addon/submit/distribution).
+  2. Choose **"On your own"** *(unlisted/self-distribution)*.
+  3. Upload `nexus-tab-0.2.1-firefox.zip`.
+  4. Mozilla's automated scanner signs it within 2 minutes and generates your permanent `.xpi` installer.
+  5. Drag the signed `.xpi` into Firefox and click **Add**.
+* **Option 2B (Firefox Developer Edition / Nightly / ESR):**
+  1. Go to `about:config` and set `xpinstall.signatures.required` to `false`.
+  2. Open `about:addons` ➔ ⚙️ ➔ **Install Add-on From File...** ➔ select the zip file.
 
 ---
 
@@ -101,7 +114,7 @@ $env:Path = "C:\Program Files\nodejs;" + $env:Path; npx.cmd wxt build -b firefox
 $env:Path = "C:\Program Files\nodejs;" + $env:Path; npx.cmd wxt zip
 $env:Path = "C:\Program Files\nodejs;" + $env:Path; npx.cmd wxt zip -b firefox --mv3
 
-# Run Automated Playwright E2E Test Suite (16/16 verified)
+# Run Automated Playwright E2E Test Suite (18/18 verified)
 $env:Path = "C:\Program Files\nodejs;" + $env:Path; node e2e/run.mjs
 ```
 
